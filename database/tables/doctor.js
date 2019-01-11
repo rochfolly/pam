@@ -1,6 +1,6 @@
 const connection = require('../../config/connection')
 const jwt = require('jwt-simple');
-const token = require('../../config/secret')
+const token = require('../config/secret')
 
 
 class Doctor {
