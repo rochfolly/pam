@@ -6,9 +6,9 @@ process.env.SECRET_KEY = 'secret'
 
 function signup (req, res) {
 
-    if(req.body.email || req.body.password) {
-        console.log('Reqêute invalide')
-        res.status(404).end('Reqêute invalide')
+    if(!req.body.email || !req.body.password) {
+        console.log('Requête invalide')
+        res.status(404).end('Requête invalide')
     }
     
     else {
@@ -57,8 +57,8 @@ function signup (req, res) {
 function login(req, res) {
 
     if(!req.body.email || !req.body.password) {
-        console.log('Reqêute invalide')
-        res.status(404).end('Reqêute invalide')
+        console.log('Requête invalide')
+        res.status(404).end('Requête invalide')
     }
     else {
       Doctor.findOne({
