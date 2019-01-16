@@ -13,13 +13,13 @@ app.use(bodyparser.urlencoded({ extended: true }))
 
 //Session
 const session = require('express-session')
-app.use(session({ secret: 'pamdev', cookie: { maxAge: 120000 }}))
+//app.use(session({ secret: 'pamdev', cookie: { maxAge: 120000 }}))
 
 const morgan = require('morgan')
 const connection = require('./database/config/connection')
 const Doctor = require('./database/models/Doctor')
 const User = require('./database/models/User')
-const account = require('./controllers/account/functions.js');
+const account = require('./api/account/functions.js');
 const cors = require('cors');
 
 
@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
   //Connexion
   doctorController.post('/login', account.login)
   
-  doctorController.get('/doctors/:id', (req, res) => {
+  doctorController.get('/:id', (req, res) => {
     console.log('doctors')
       Doctor.findAll({
         where: {
@@ -56,14 +56,35 @@ app.get('/', (req, res) => {
       }).then((doctor) => res.json(doctor))
   })
 
+  doctorController.get('/users/:id', (req, res) => {
+    User.findAll({
+      where: {
+        doctor_id: req.params.id
+      }
+    })
+    .then((users) => {
+      var usersArray = []      
+      users.forEach((user, index) =>
+      usersArray[index] = [
+        user.dataValues.id, 
+        user.dataValues.firstname,
+        user.dataValues.name,
+        user.dataValues.email,
+      ])
+      console.log(usersArray)
+      res.send(usersArray)
+     })
+  })
+
 
   doctorController.get('/doctors', (req, res) => {
     console.log('doctors')
       Doctor.findAll()
-      .then((doctors) => res.json(doctors))
+      .then((doctors) => res.send(doctors))
       
   })
   
+
   doctorController.get('/admins', (req, res) => {
     connection.query('SELECT * from admin', (err, results) => {
       if(err) {
@@ -91,11 +112,7 @@ userController.get('/users', (req, res) => {
   })
 })
 
-userController.post('/create', (req, res) => {
-  User.create(req.body.user)
-  .then(console.log('User ajouté'))
-  .then(res.status(200).end('Added'))
-})
+userController.post('/create', account.createUser)
 
 
 

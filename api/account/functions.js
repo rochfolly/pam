@@ -88,6 +88,35 @@ function login(req, res) {
     }
 }  
 
+function createUser (res, res) {
+    if(!req.body.email || !req.body.password) {
+        console.log('Reqêute invalide')
+        res.status(404).end('Reqêute invalide')
+    }
+    else {
+        const newUser = {
+            doctor_id: req.body.doctor_id,
+            firstname: req.body.firstname,
+            name: req.body.name,
+            email: req.body.email
+        }
+        User.findOne({
+            where: req.body.email
+        })
+        .then((user) => {
+            if(user){
+                console.log('Ce Patient existe déjà')
+                res.status(204).end('Ce Patient existe déjà')
+            }
+            else{
+                User.create(newUser)
+            }
+        })
+        .then(console.log('User ajouté'))
+        .then(res.status(200).end('Added'))
+     }
+}
+
               
 /*
      function (error) {
@@ -110,5 +139,6 @@ function login(req, res) {
             }
 */
 
+exports.createUser = createUser;
 exports.signup = signup;
 exports.login = login;
