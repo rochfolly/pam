@@ -63,6 +63,7 @@ app.get('/', (req, res) => {
       }
     })
     .then((users) => {
+      //console.log(users[0].dataValues)
       var usersArray = []      
       users.forEach((user, index) =>
       usersArray[index] = [
@@ -76,6 +77,14 @@ app.get('/', (req, res) => {
      })
   })
 
+  doctorController.get('/user/:id', (req, res) => {
+    User.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).then((user) => res.send(user.dataValues))
+  })
+
 
   doctorController.get('/doctors', (req, res) => {
     console.log('doctors')
@@ -85,18 +94,6 @@ app.get('/', (req, res) => {
   })
   
 
-  doctorController.get('/admins', (req, res) => {
-    connection.query('SELECT * from admin', (err, results) => {
-      if(err) {
-        return res.send(err)
-      }
-      else {
-        return res.json({
-          data: results
-        })
-      }
-    })
-  });
 
 
 
@@ -114,8 +111,20 @@ userController.get('/users', (req, res) => {
 
 userController.post('/create', account.createUser)
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+app.get('/admins', (req, res) => {
+  connection.query('SELECT * from admin', (err, results) => {
+    if(err) {
+      return res.send(err)
+    }
+    else {
+      return res.json({
+        data: results
+      })
+    }
+  })
+});
 
 app.use('/doctor', doctorController)
 app.use('/user', userController)
