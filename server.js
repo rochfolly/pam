@@ -17,12 +17,15 @@ const session = require('express-session')
 
 const morgan = require('morgan')
 const connection = require('./database/config/connection')
+
 const Doctor = require('./database/models/Doctor')
 const User = require('./database/models/User')
+
 const account = require('./api/account/functions.js');
+const exercice = require('./api/exercice/functions.js')
+
+
 const cors = require('cors');
-
-
 app.use(cors())
 app.use(morgan('dev'))
 
@@ -93,10 +96,8 @@ app.get('/', (req, res) => {
       
   })
   
-
-
-
-
+  doctorController.get('/user/:id/exercices', exercice.fetch)
+   
 /////////////////////////////////////////////////  User  ////////////////////////////////////////////////////////
 
 userController.get('/', (req, res) => {

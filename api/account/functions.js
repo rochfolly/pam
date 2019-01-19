@@ -75,8 +75,6 @@ function login(req, res) {
                     let token = jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
                         expiresIn: 1440
                     })
-                    if(token) {console.log(token)}
-                    else {console.log("Pas de token")}
                     res.send(token)
                 }
                 else res.status(404).end('mot de passe incorrect')
