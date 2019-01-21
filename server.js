@@ -18,6 +18,7 @@ const session = require('express-session')
 const morgan = require('morgan')
 const connection = require('./database/config/connection')
 
+const Prescriprion = require('./database/models/Prescription')
 const Doctor = require('./database/models/Doctor')
 const User = require('./database/models/User')
 
@@ -97,8 +98,11 @@ app.get('/', (req, res) => {
   })
   
   doctorController.get('/user/:id/exercices', exercice.fetch)
+
+  
    
 /////////////////////////////////////////////////  User  ////////////////////////////////////////////////////////
+
 
 userController.get('/', (req, res) => {
   res.end('Go to /users to see all the users')
@@ -110,7 +114,18 @@ userController.get('/users', (req, res) => {
   })
 })
 
+//backurl+ '/user/'+ user_id +'/prescription/'+ exo_id
+userController.delete('/:user_id/prescription/:exo_id', (req, res) => {
+  Prescriprion.destroy({
+    where: {
+     user_id : req.params.user_id,
+     exo_id : req.params.exo_id
+    }
+  })
+})
+
 userController.post('/create', account.createUser)
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
