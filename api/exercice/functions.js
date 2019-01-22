@@ -5,7 +5,6 @@ const sequelize = require("sequelize")
 
 //SELECT * FROM user, prescription WHERE user.id = prescription.user_id
 function fetch (req, res) {
-    console.log('working')
   db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ?",
   { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
   .then(rows => {
