@@ -114,9 +114,20 @@ userController.get('/users', (req, res) => {
   })
 })
 
-//backurl+ '/user/'+ user_id +'/prescription/'+ exo_id
 userController.delete('/:user_id/prescription/:exo_id', (req, res) => {
   Prescriprion.destroy({
+    where: {
+     user_id : req.params.user_id,
+     exo_id : req.params.exo_id
+    }
+  })
+})
+
+
+userController.post('/:user_id/prescription/:exo_id/:level', (req, res) => {
+  Prescriprion.update({
+    level: req.params.level,
+  },{
     where: {
      user_id : req.params.user_id,
      exo_id : req.params.exo_id

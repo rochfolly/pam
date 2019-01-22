@@ -30,20 +30,24 @@ function signup (req, res) {
             email: req.body.email
         }
     })
-        .then((err, doctor) => {
+        .then((doctor) => {
             doctor ? console.log('déjà existant') : console.log(doctor)
             if (!doctor) {
                 newdoctor.password = passwordHash.generate(req.body.password)                   
                 Doctor.create(newdoctor)
                 .then(doctor => {
-                    res.json({ status: doctor.email + ' registered' })
                     console.log(doctor.email + ' registered')
+                    let token = jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
+                        expiresIn: 1440
+                    })
+                    res.send(token)
                     })
                     .catch(err => {
                             res.send('error: ' + err)
                     })
             } else {
-                res.json({ error: "Ce docteur existe déjà" })
+                res.send({ error: "Ce docteur existe déjà" })
+                console.log("Ce docteur existe déjà")
             }
         })
         .catch(err => {
