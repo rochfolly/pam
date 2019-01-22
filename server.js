@@ -156,6 +156,11 @@ app.get('/admins', (req, res) => {
 app.use('/doctor', doctorController)
 app.use('/user', userController)
 
+
+app.post('/score', (req, res) =>{
+  res.json(req.body)
+})
+
 app.listen(8000, (err) =>
 console.log('Listening back on port 8000'))
 
