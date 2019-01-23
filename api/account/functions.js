@@ -1,4 +1,5 @@
 const Doctor = require('../../database/models/Doctor')
+const User = require('../../database/models/User')
 const passwordHash = require("password-hash");  
 const jwt = require('jsonwebtoken')
 
@@ -9,12 +10,10 @@ function signup (req, res) {
     if(!req.body.email || !req.body.password) {
         console.log('Requête invalide')
         res.status(404).end('Requête invalide')
-    }
-    
-    else {
-    
-    const today = new Date()
-    const newdoctor = {
+    }   
+    else {    
+      const today = new Date()
+      const newdoctor = {
         firstname: req.body.firstname,
         name: req.body.name,
         email: req.body.email,
@@ -31,7 +30,7 @@ function signup (req, res) {
         }
     })
         .then((doctor) => {
-            doctor ? console.log('déjà existant') : console.log(doctor)
+            doctor ? console.log('déjà existant') : console.log("Inscription en cours")
             if (!doctor) {
                 newdoctor.password = passwordHash.generate(req.body.password)                   
                 Doctor.create(newdoctor)
@@ -93,10 +92,10 @@ function login(req, res) {
     }
 }  
 
-function createUser (res, res) {
-    if(!req.body.email || !req.body.password) {
-        console.log('Reqêute invalide')
-        res.status(404).end('Reqêute invalide')
+function createUser (req, res) {
+    if(!req.body.email || !req.body.firstname) {
+        console.log('Requête invalide')
+        res.status(404).end('Requête invalide')
     }
     else {
         const newUser = {
@@ -106,7 +105,9 @@ function createUser (res, res) {
             email: req.body.email
         }
         User.findOne({
-            where: req.body.email
+            where: {
+                email: req.body.email
+            }
         })
         .then((user) => {
             if(user){
@@ -115,10 +116,13 @@ function createUser (res, res) {
             }
             else{
                 User.create(newUser)
+                .then(user => {
+                   //console.log(user.firstname + 'ajouté')
+                   console.log(user.dataValues)
+                   res.send(user.dataValues)
+                })
             }
         })
-        .then(console.log('User ajouté'))
-        .then(res.status(200).end('Added'))
      }
 }
 
