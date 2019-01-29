@@ -24,6 +24,7 @@ const User = require('./database/models/User')
 
 const account = require('./api/account/functions.js');
 const exercice = require('./api/exercice/functions.js')
+const mails = require('./api/mail/mailer.js')
 
 
 const cors = require('cors');
@@ -133,6 +134,10 @@ userController.post('/:user_id/prescription/:exo_id/:level', (req, res) => {
      exo_id : req.params.exo_id
     }
   })
+})
+
+userController.post('/new', (req, res) => {
+   mails.mailToUser(req.body.user)
 })
 
 userController.post('/create', account.createUser)

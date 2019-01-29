@@ -30,6 +30,9 @@ module.exports = db.sequelize.define(
         city: {
             type: Sequelize.STRING,
         },
+        is_doctor: {
+            type: Sequelize.INTEGER,
+        },
         created: {
             type: Sequelize.DATE,
             defaultValue: Sequelize.NOW,

@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const Doctor = require('../../database/models/Doctor')
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: 'Gmail',
   auth: {
     user: 'parleavecmoi2019@gmail.com',
     pass: 'ccrst2019'
@@ -13,7 +13,7 @@ const mailOptions = newUser => {
   const options = {
   from: 'parleavecmoi2019@gmail.com',
   to: newUser.email, 
-  subject: 'PAM : New User',
+  subject: 'PAM : Activation de votre compte',
   html: '<p>Bonjour `${newUser.firstname}`, Votre orthophoniste a demandé une création de votre compte sur notre plateforme.</p><p>Vous pouvez finaliser votre inscription <a href="http://localhost:3000/user/inscription">ici</a></p>'
   }
   return options
@@ -36,8 +36,18 @@ function mailOptionsAdmins (req, res) {
 
 }
 
-export const mailToAdmins = _ => {
+/*export const mailToAdmins = _ => {
   transporter.sendMail(mailOptionsAdmins, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  })
+} */
+
+function mailToUser(newUser) {
+  transporter.sendMail(mailOptions(newUser), function(error, info){
     if (error) {
       console.log(error);
     } else {
@@ -46,16 +56,8 @@ export const mailToAdmins = _ => {
   })
 }
 
-export const mailToAdmins = newUser => {
-  transporter.sendMail(mailOptionsAdmins, function(error, info){
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  })
-}
+exports.mailToUser = mailToUser;
 
 
 
-module.exports = mailer
+//module.exports = mailer

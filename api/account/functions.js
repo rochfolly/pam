@@ -75,15 +75,43 @@ function login(req, res) {
                 if (passwordHash.verify(req.body.password, doctor.password)) {
                     console.log('mot de passe correct')
                     console.log(doctor.dataValues)
-                    let token = jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
+                    let key = {
+                        type: doctor.dataValues, 
+                        token: jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
                         expiresIn: 1440
-                    })
-                    res.send(token)
+                        })
+                    }
+                    res.send(key)
                 }
                 else res.status(404).end('mot de passe incorrect')
             } else {
-                console.log('Email incorrect')
-                res.status(400).json({ error: 'User does not exist' })
+                User.findOne({
+                    where: {
+                        email: req.body.email
+                    }
+                })
+                .then(user => {
+                    if(user){
+                        console.log('verification user')
+                        if (req.body.password == user.password) {
+                            console.log('mot de passe correct')
+                            console.log(user.dataValues)
+                            let key = {
+                                type: user.dataValues, 
+                                token: jwt.sign(user.dataValues, process.env.SECRET_KEY, {
+                                expiresIn: 1440
+                                })
+                            }
+                            res.send(key)
+                        }
+                        else res.status(404).end('mot de passe incorrect')
+                    }
+                    else {
+                        console.log('Email incorrect')
+                        res.status(400).json({ error: 'User does not exist' })
+                    }
+                })
+                
             }
         })
         .catch(err => {
