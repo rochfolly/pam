@@ -100,6 +100,9 @@ app.get('/', (req, res) => {
   
   doctorController.get('/user/:id/exercices', exercice.fetch)
 
+  doctorController.get('/user/:id/exercices/other', exercice.fetchOther)
+
+
   
    
 /////////////////////////////////////////////////  User  ////////////////////////////////////////////////////////
@@ -125,16 +128,7 @@ userController.delete('/:user_id/prescription/:exo_id', (req, res) => {
 })
 
 
-userController.post('/:user_id/prescription/:exo_id/:level', (req, res) => {
-  Prescriprion.update({
-    level: req.params.level,
-  },{
-    where: {
-     user_id : req.params.user_id,
-     exo_id : req.params.exo_id
-    }
-  })
-})
+userController.post('/:user_id/prescription/:exo_id', exercice.updatePrescription)
 
 userController.post('/new', (req, res) => {
    mails.mailToUser(req.body.user)
