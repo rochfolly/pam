@@ -21,6 +21,8 @@ const connection = require('./database/config/connection')
 const Prescriprion = require('./database/models/Prescription')
 const Doctor = require('./database/models/Doctor')
 const User = require('./database/models/User')
+const Score = require('./database/models/Score')
+
 
 const account = require('./api/account/functions.js');
 const exercice = require('./api/exercice/functions.js')
@@ -136,6 +138,20 @@ userController.post('/new', (req, res) => {
 
 userController.post('/create', account.createUser)
 
+
+userController.post('/:user_id/:exo_id/result/:score', (req, res) => {
+  const newScore = {
+    user_id: req.params.user_id,
+    value: req.params.score,
+    exo_id: req.params.exo_id,
+    created: new Date()
+  }
+  Score.create(newScore).then(score => res.send(score))
+})
+
+userController.post('/result', (req, res) => {
+  Score.create(req.body.score).then(score => res.send(score))
+})
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
