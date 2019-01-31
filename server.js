@@ -149,6 +149,9 @@ userController.post('/:user_id/:exo_id/result/:score', (req, res) => {
   Score.create(newScore).then(score => res.send(score))
 })
 
+userController.get('/:id/stats', exercice.getStats)
+
+
 userController.post('/result', (req, res) => {
   Score.create(req.body.score).then(score => res.send(score))
 })
