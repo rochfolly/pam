@@ -16,7 +16,7 @@ const session = require('express-session')
 //app.use(session({ secret: 'pamdev', cookie: { maxAge: 120000 }}))
 
 const morgan = require('morgan')
-const connection = require('./database/config/connection')
+//const connection = require('./database/config/connection')
 
 const Prescriprion = require('./database/models/Prescription')
 const Doctor = require('./database/models/Doctor')
@@ -151,6 +151,8 @@ userController.post('/:user_id/:exo_id/result/:score', (req, res) => {
 
 userController.get('/:id/stats', exercice.getStats)
 
+userController.get('/:id/global', exercice.getGlobal)
+
 
 userController.post('/result', (req, res) => {
   Score.create(req.body.score).then(score => res.send(score))
@@ -158,7 +160,7 @@ userController.post('/result', (req, res) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-app.get('/admins', (req, res) => {
+/*app.get('/admins', (req, res) => {
   connection.query('SELECT * from admin', (err, results) => {
     if(err) {
       return res.send(err)
@@ -169,7 +171,7 @@ app.get('/admins', (req, res) => {
       })
     }
   })
-});
+}); */
 
 app.use('/doctor', doctorController)
 app.use('/user', userController)
