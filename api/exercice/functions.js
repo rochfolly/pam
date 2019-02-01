@@ -64,9 +64,11 @@ function getStats(req, res){
       var ResponseTab = new Array(rows.length)
       rows.forEach((exo, index) => {
           console.log(index)
-          ResponseTab[index] = {title:'', plays:'', bestScore:'', lastScore:'', lastPlay:'', dates:[], values:[]}
+          ResponseTab[index] = {id:'', title:'', plays:'', bestScore:'', lastScore:'', lastPlay:'', dates:[], values:[]}
           //Titres
           ResponseTab[index].title = exo.exo_name
+          ResponseTab[index].id = exo.exo_id
+
 
           //Nombre de parties jouées
           db.sequelize.query("SELECT COUNT(id) AS played FROM score WHERE exo_id = ? AND user_id = ?",
