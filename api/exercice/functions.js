@@ -114,7 +114,6 @@ function getStats(req, res){
                               res.send(ResponseTab)
                             }
                           })
-
                       })
 
                   })
@@ -131,7 +130,6 @@ function getStats(req, res){
 }
 
 function getGlobal(req, res) {
-  //Exercices prescrits
   db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
   { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
   .then(rows => {
@@ -147,11 +145,46 @@ function getGlobal(req, res) {
               })
       })
   })
+  
+}
+
+function fillJauge(req, res){
+  db.sequelize.query("SELECT SUM(value) AS total FROM score WHERE user_id = ?",
+  { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
+  .then(rows => {
+    console.log(rows)
+    res.send(rows[0].total)
+  })
 }
 
 
 exports.updatePrescription = updatePrescription;
 exports.fetchOther = fetchOther;
 exports.getGlobal = getGlobal;
+exports.fillJauge = fillJauge;
 exports.getStats = getStats;
 exports.fetch = fetch;
+
+/*
+var ResponseTab = new Array (2)
+  ResponseTab[0] = {label:'coucou', titles:[], bestscores:[]}
+  ResponseTab[1] = {label:'coucou', titles:[], bestscores:[]}
+
+
+  //Exercices prescrits
+  db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
+  { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
+  .then(rows => {
+    rows.forEach((exo, index) => {
+        ResponseTab[0].titles[index] = exo.exo_name
+        ResponseTab[1].titles[index] = exo.exo_name
+        db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ?",
+        { replacements: [exo.exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+        .then(row => {
+          console.log(row)
+           ResponseTab[0].bestscores[index] = row[0].maxscore
+           ResponseTab[1].bestscores[index] = row[0].maxscore
+          if(index == rows.length-1){ res.send(ResponseTab)}
+        })
+    })
+      })*/

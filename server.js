@@ -153,6 +153,8 @@ userController.get('/:id/stats', exercice.getStats)
 
 userController.get('/:id/global', exercice.getGlobal)
 
+userController.get('/:id/jauge', exercice.fillJauge)
+
 
 userController.post('/result', (req, res) => {
   Score.create(req.body.score).then(score => res.send(score))
