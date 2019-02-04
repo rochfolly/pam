@@ -154,7 +154,131 @@ function createUser (req, res) {
      }
 }
 
-              
+/*Post.update({
+    updatedAt: null,
+  }, {
+    where: {
+      deletedAt: {
+        $ne: null
+      }
+    }
+  }); */
+
+function updateUser(req, res){
+    if(req.body.data.password){
+        User.update({
+        firstname: req.body.data.firstname, 
+        name: req.body.data.name,
+        password: passwordHash.generate(req.body.data.password),
+        city: req.body.data.city
+        }, {
+            where: {
+                id: req.body.data.id
+            }
+        }).then((affected) => {
+            User.findOne({
+                where: {
+                    id: req.body.data.id
+                }
+            }).then((user) => {
+                let key = {
+                    type: user.dataValues, 
+                    token: jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
+                    expiresIn: 1440
+                    })
+                }
+                res.send(key)
+            })
+        })
+      }
+      else{
+        User.update({
+          firstname: req.body.data.firstname, 
+          name: req.body.data.name,
+          city: req.body.data.city
+          }, {
+              where: {
+                  id: req.body.data.id
+              }
+          }).then((affected) => {
+            User.findOne({
+                where: {
+                    id: req.body.data.id
+                }
+            }).then((user) => {
+                let key = {
+                    type: user.dataValues, 
+                    token: jwt.sign(user.dataValues, process.env.SECRET_KEY, {
+                    expiresIn: 1440
+                    })
+                }
+                res.send(key)
+            })
+        })
+     }
+}
+
+function updateDoctor(req, res){
+    if(req.body.data.password){
+        Doctor.update({
+        firstname: req.body.data.firstname, 
+        name: req.body.data.name,
+        password: passwordHash.generate(req.body.data.password),
+        city: req.body.data.city
+        }, {
+            where: {
+                id: req.body.data.id
+            }
+        }).then((affected) => {
+            Doctor.findOne({
+                where: {
+                    id: req.body.data.id
+                }
+            }).then((doctor) => {
+                let key = {
+                    type: doctor.dataValues, 
+                    token: jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
+                    expiresIn: 1440
+                    })
+                }
+                res.send(key)
+            })
+        })
+      }
+      else{
+        Doctor.update({
+          firstname: req.body.data.firstname, 
+          name: req.body.data.name,
+          city: req.body.data.city
+          }, {
+              where: {
+                  id: req.body.data.id
+              }
+          }).then((affected) => {
+            Doctor.findOne({
+                where: {
+                    id: req.body.data.id
+                }
+            }).then((doctor) => {
+                let key = {
+                    type: doctor.dataValues, 
+                    token: jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
+                    expiresIn: 1440
+                    })
+                }
+                res.send(key)
+            })
+        })
+     }
+}
+
+exports.updateDoctor = updateDoctor;
+exports.createUser = createUser;
+exports.updateUser = updateUser;
+exports.signup = signup;
+exports.login = login;
+
+
 /*
      function (error) {
                 switch (error) {
@@ -175,7 +299,3 @@ function createUser (req, res) {
                 }
             }
 */
-
-exports.createUser = createUser;
-exports.signup = signup;
-exports.login = login;

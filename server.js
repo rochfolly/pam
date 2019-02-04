@@ -99,6 +99,8 @@ app.get('/', (req, res) => {
       .then((doctors) => res.send(doctors))
       
   })
+
+  doctorController.post('/update', account.updateDoctor)
   
   doctorController.get('/user/:id/exercices', exercice.fetch)
 
@@ -137,6 +139,8 @@ userController.post('/new', (req, res) => {
 })
 
 userController.post('/create', account.createUser)
+
+userController.post('/update', account.updateUser)
 
 
 userController.post('/:user_id/:exo_id/result/:score', (req, res) => {
