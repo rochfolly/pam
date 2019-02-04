@@ -131,6 +131,74 @@ function getStats(req, res){
 
 }
 
+function getSingleStats(req, res){
+  //Exercices prescrits
+  db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? AND p.exo_id = ?",
+  { replacements: [req.params.id, req.params.exo_id], type: sequelize.QueryTypes.SELECT })
+  .then(row => {
+      var ResponseTab = [{id:'', title:'', plays:'', bestScore:'', lastScore:'', lastPlay:'', dates:[], values:[]}]
+          
+          //Titres
+          ResponseTab[0].title = row[0].exo_name
+          ResponseTab[0].id = row[0].exo_id
+
+
+          //Nombre de parties jouées
+          db.sequelize.query("SELECT COUNT(id) AS played FROM score WHERE exo_id = ? AND user_id = ?",
+          { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+          .then(count => {
+              ResponseTab[0].plays = count[0].played
+
+              //Meilleur score
+              db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ?",
+              { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+              .then(max => {
+                  ResponseTab[0].bestScore = max[0].maxscore
+                  
+                  //Dernière partie
+                  db.sequelize.query("SELECT created, value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created DESC LIMIT 1",
+                  { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+                  .then(last => {
+                    ResponseTab[0].lastScore = last[0].value
+                    ResponseTab[0].lastPlay = moment(last[0].created).format('LLL') 
+ 
+                      //Dates (graph)
+                      db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 10",
+                      { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+                      .then(plays => {
+                          const proper = []
+                          plays.forEach((play, index) => {
+                            proper[index] = moment(play.created).format('L')
+                          })
+                          ResponseTab[0].dates = proper
+                          console.log(plays)
+
+                          //Valeurs (graph)
+                          db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 10",
+                          { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+                          .then(scores => {
+                            const palmares = []
+                            scores.forEach((score, index) => {
+                             palmares[index] = score.value
+                            })
+                            ResponseTab[0].values = palmares
+                              console.log(ResponseTab)
+                              res.send(ResponseTab)
+                            
+                          })
+                      })
+
+                  })
+
+              })
+
+          })        
+       
+      
+  })
+
+}
+
 function getGlobal(req, res) {
   db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
   { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
@@ -172,6 +240,7 @@ function fillJauge(req, res){
 
 
 exports.updatePrescription = updatePrescription;
+exports.getSingleStats = getSingleStats;
 exports.fetchOther = fetchOther;
 exports.getGlobal = getGlobal;
 exports.fillJauge = fillJauge;

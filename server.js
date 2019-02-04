@@ -155,6 +155,8 @@ userController.post('/:user_id/:exo_id/result/:score', (req, res) => {
 
 userController.get('/:id/stats', exercice.getStats)
 
+userController.get('/:id/stats/:exo_id', exercice.getSingleStats)
+
 userController.get('/:id/global', exercice.getGlobal)
 
 userController.get('/:id/jauge', exercice.fillJauge)
