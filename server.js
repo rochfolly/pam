@@ -142,6 +142,9 @@ userController.post('/create', account.createUser)
 
 userController.post('/update', account.updateUser)
 
+userController.post('/:new_id/first', exercice.createFirst)
+
+
 
 userController.post('/:user_id/:exo_id/result/:score', (req, res) => {
   const newScore = {

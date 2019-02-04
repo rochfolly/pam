@@ -36,10 +36,13 @@ function signup (req, res) {
                 Doctor.create(newdoctor)
                 .then(doctor => {
                     console.log(doctor.email + ' registered')
-                    let token = jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
+                    let key = {
+                        type: doctor.dataValues, 
+                        token: jwt.sign(doctor.dataValues, process.env.SECRET_KEY, {
                         expiresIn: 1440
-                    })
-                    res.send(token)
+                        })
+                    }
+                    res.send(key)
                     })
                     .catch(err => {
                             res.send('error: ' + err)

@@ -55,6 +55,23 @@ function updatePrescription (req, res) {
   })
 }
 
+function createFirst(req, res){
+   const prescriptions = req.body.data
+   prescriptions.forEach((exercice, index) => {
+     if(exercice.exo){
+      const new_pres = {
+        exo_id: exercice.exo,
+        user_id: req.params.new_id,
+        exo_name: exercice.name,
+        level: exercice.level
+      }
+       Prescription.create(new_pres).then(pres => {
+         if(index == 2){res.send(req.params.new_id)}
+       })
+     }
+   })
+}
+
 
 function getStats(req, res){
   //Exercices prescrits
@@ -241,6 +258,7 @@ function fillJauge(req, res){
 
 exports.updatePrescription = updatePrescription;
 exports.getSingleStats = getSingleStats;
+exports.createFirst = createFirst;
 exports.fetchOther = fetchOther;
 exports.getGlobal = getGlobal;
 exports.fillJauge = fillJauge;
