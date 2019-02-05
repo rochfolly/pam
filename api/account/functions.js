@@ -157,15 +157,7 @@ function createUser (req, res) {
      }
 }
 
-/*Post.update({
-    updatedAt: null,
-  }, {
-    where: {
-      deletedAt: {
-        $ne: null
-      }
-    }
-  }); */
+
 
 function updateUser(req, res){
     if(req.body.data.password){

@@ -9,13 +9,34 @@ function fetch (req, res) {
   db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
   { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
   .then(rows => {
-      console.log(rows)
-      res.send(rows)
+    console.log('adding', rows)
+    var ResponseTab = new Array (rows.length)
+    rows.forEach((exo, index) => {
+      ResponseTab[index] = { 
+        exo_name: exo.exo_name, 
+        exo_id: exo.exo_id, 
+        level: exo.level, 
+        user_id: exo.user_id,
+        lastPlay: '',
+        lastScore: ''
+       }
+      db.sequelize.query("SELECT MAX(created) AS last, value FROM score s WHERE user_id = ? AND exo_id = ?",
+      { replacements: [req.params.id, exo.exo_id], type: sequelize.QueryTypes.SELECT })
+      .then(datas => {
+        console.log(datas[0].last)
+        ResponseTab[index].lastPlay = moment(datas[0].last).format('LL')
+        ResponseTab[index].lastScore = datas[0].value
+        if(index == rows.length-1){res.send(ResponseTab)}
+      })
+    })
+
   })
   .catch(err => {
     res.status(400).json({ error: err })
   })
 }
+
+//{ exo_name: 'Texte à trous', exo_id: 1, level: 2, user_id: 1 }
 
 function fetchOther (req, res) {
   db.sequelize.query("SELECT * FROM exercice WHERE exo_id NOT IN (SELECT exo_id FROM prescription WHERE user_id = ?)",
@@ -29,30 +50,68 @@ function fetchOther (req, res) {
   })
 }
 
-function updatePrescription (req, res) {
-  Prescription.findOne({
-    where: {
-      user_id : req.params.user_id,
-      exo_id : req.params.exo_id
+function checkOther (req, res) {
+  db.sequelize.query("SELECT * FROM exercice WHERE exo_id NOT IN (SELECT exo_id FROM prescription WHERE user_id = ?)",
+  { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
+  .then(rows => {
+    console.log(rows.length)
+    if(rows.length>0){
+      res.send({check: true})
     }
-  }).then(pres => {
-      if(pres){
-         res.end()
-      }
-      else{
-        db.sequelize.query("SELECT exo_name FROM exercice WHERE exo_id = ?",
-        { replacements: [req.params.exo_id], type: sequelize.QueryTypes.SELECT })
-        .then(name => {
-          const new_pres = {
-          exo_id: req.params.exo_id,
-          user_id: req.params.user_id,
-          exo_name: name,
-          level: 1
-        }
-        Prescription.create(new_pres)
-        })
-    }
+    else{res.send({check: false})}
   })
+  .catch(err => {
+    res.status(400).json({ error: err })
+  })
+}
+/*Post.update({
+    updatedAt: null,
+  }, {
+    where: {
+      deletedAt: {
+        $ne: null
+      }
+    }
+  }); */
+
+function updatePrescription (req, res) {
+  const prescriptions = req.body.data
+  prescriptions.forEach((pres) => {
+    if(pres.exo){
+      Prescription.update({level: pres.level},{
+        where: {
+          exo_id: pres.exo,
+          user_id: req.params.id
+        }
+      })
+    }
+    else{
+      Prescription.destroy({
+        where:{exo_name:pres.name, user_id: req.params.id}
+      })
+    }
+    
+  })
+  res.send('Prescriptions mises à jour avec succès!')
+  
+}
+
+function addPrescription (req, res) {
+  const prescriptions = req.body.data
+  prescriptions.forEach((pres) => {
+    if(pres.exo){
+      const new_pres = {
+        exo_id: pres.exo,
+        user_id: req.params.user_id,
+        exo_name: pres.name,
+        level: pres.level
+      }
+      Prescription.create(new_pres)
+    }
+    
+  })
+  res.send('Prescriptions mises à jour avec succès!')
+  
 }
 
 function createFirst(req, res){
@@ -257,34 +316,13 @@ function fillJauge(req, res){
 
 
 exports.updatePrescription = updatePrescription;
+exports.addPrescription = addPrescription;
 exports.getSingleStats = getSingleStats;
 exports.createFirst = createFirst;
+exports.checkOther = checkOther;
 exports.fetchOther = fetchOther;
 exports.getGlobal = getGlobal;
 exports.fillJauge = fillJauge;
 exports.getStats = getStats;
 exports.fetch = fetch;
 
-/*
-var ResponseTab = new Array (2)
-  ResponseTab[0] = {label:'coucou', titles:[], bestscores:[]}
-  ResponseTab[1] = {label:'coucou', titles:[], bestscores:[]}
-
-
-  //Exercices prescrits
-  db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
-  { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
-  .then(rows => {
-    rows.forEach((exo, index) => {
-        ResponseTab[0].titles[index] = exo.exo_name
-        ResponseTab[1].titles[index] = exo.exo_name
-        db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ?",
-        { replacements: [exo.exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
-        .then(row => {
-          console.log(row)
-           ResponseTab[0].bestscores[index] = row[0].maxscore
-           ResponseTab[1].bestscores[index] = row[0].maxscore
-          if(index == rows.length-1){ res.send(ResponseTab)}
-        })
-    })
-      })*/

@@ -106,7 +106,7 @@ app.get('/', (req, res) => {
 
   doctorController.get('/user/:id/exercices/other', exercice.fetchOther)
 
-
+  doctorController.get('/user/:id/exercices/checkOther', exercice.checkOther)
   
    
 /////////////////////////////////////////////////  User  ////////////////////////////////////////////////////////
@@ -132,7 +132,10 @@ userController.delete('/:user_id/prescription/:exo_id', (req, res) => {
 })
 
 
-userController.post('/:user_id/prescription/:exo_id', exercice.updatePrescription)
+userController.post('/:user_id/prescription/update', exercice.updatePrescription)
+
+userController.post('/:user_id/prescription/add', exercice.addPrescription)
+
 
 userController.post('/new', (req, res) => {
    mails.mailToUser(req.body.user)
