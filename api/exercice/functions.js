@@ -123,6 +123,18 @@ function createFirst(req, res){
    })
 }
 
+function getLevel(req, res){
+  Prescription.findOne({
+    where: {
+      exo_id: req.params.exo_id,
+      user_id: req.params.id
+    }
+  }).then(pres => {
+    console.log(pres.level)
+    res.send(pres)
+  })
+}
+
 
 function getStats(req, res){
   //Exercices prescrits
@@ -325,6 +337,7 @@ exports.checkOther = checkOther;
 exports.fetchOther = fetchOther;
 exports.getGlobal = getGlobal;
 exports.fillJauge = fillJauge;
+exports.getLevel = getLevel;
 exports.getStats = getStats;
 exports.fetch = fetch;
 

@@ -28,6 +28,8 @@ const account = require('./api/account/functions.js');
 const exercice = require('./api/exercice/functions.js')
 const mails = require('./api/mail/mailer.js')
 
+const audio = require ('./txtToSpeech.js')
+
 
 const cors = require('cors');
 app.use(cors())
@@ -163,6 +165,8 @@ userController.get('/:id/stats', exercice.getStats)
 
 userController.get('/:id/stats/:exo_id', exercice.getSingleStats)
 
+userController.get('/:id/level/:exo_id', exercice.getLevel)
+
 userController.get('/:id/global', exercice.getGlobal)
 
 userController.get('/:id/jauge', exercice.fillJauge)
@@ -174,18 +178,7 @@ userController.post('/result', (req, res) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*app.get('/admins', (req, res) => {
-  connection.query('SELECT * from admin', (err, results) => {
-    if(err) {
-      return res.send(err)
-    }
-    else {
-      return res.json({
-        data: results
-      })
-    }
-  })
-}); */
+app.post('/textts', audio.textToSpeech)
 
 app.use('/doctor', doctorController)
 app.use('/user', userController)
