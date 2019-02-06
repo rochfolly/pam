@@ -2,7 +2,9 @@ const Doctor = require('../../database/models/Doctor')
 const Prescription = require('../../database/models/Prescription')
 const db = require("../../database/config/db")
 const sequelize = require("sequelize")
-const moment = require('moment')
+const moment = require('./moment')
+
+
 
 //SELECT * FROM user, prescription WHERE user.id = prescription.user_id
 function fetch (req, res) {
