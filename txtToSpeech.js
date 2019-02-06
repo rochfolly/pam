@@ -31,8 +31,8 @@ function textToSpeech(req) {
             saveAudio(body, req.body.txt, req)
         }
         else {
-			
-          throw new Error(error);
+            console.log(response.statusCode)
+            throw new Error(error);
 		  
         }
     }
@@ -84,7 +84,7 @@ function saveAudio(accessToken, txte, req) {
       console.log("Your file is ready.\n")
     }
     // Pipe the response to file.
-    request(options, convertText).pipe(fs.createWriteStream(`src/sample${req.params.question}.wav`));
+    request(options, convertText).pipe(fs.createWriteStream(`src/samples/sample${req.params.question}.wav`));
 }
 
 // Runs the sample app.
