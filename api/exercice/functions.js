@@ -5,7 +5,6 @@ const sequelize = require("sequelize")
 const moment = require('./moment')
 
 
-
 //SELECT * FROM user, prescription WHERE user.id = prescription.user_id
 function fetch (req, res) {
   db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
@@ -66,15 +65,7 @@ function checkOther (req, res) {
     res.status(400).json({ error: err })
   })
 }
-/*Post.update({
-    updatedAt: null,
-  }, {
-    where: {
-      deletedAt: {
-        $ne: null
-      }
-    }
-  }); */
+
 
 function updatePrescription (req, res) {
   const prescriptions = req.body.data
@@ -119,17 +110,16 @@ function addPrescription (req, res) {
 function createFirst(req, res){
    const prescriptions = req.body.data
    prescriptions.forEach((exercice, index) => {
-     if(exercice.exo){
-      const new_pres = {
-        exo_id: exercice.exo,
-        user_id: req.params.new_id,
-        exo_name: exercice.name,
-        level: exercice.level
-      }
-       Prescription.create(new_pres).then(pres => {
-         if(index == 2){res.send(req.params.new_id)}
-       })
+      if(exercice.exo){
+        const new_pres = {
+          exo_id: exercice.exo,
+          user_id: req.params.new_id,
+          exo_name: exercice.name,
+          level: exercice.level
+        }
+      Prescription.create(new_pres)
      }
+     if(index == 2){res.send(req.params.new_id)}
    })
 }
 
@@ -169,7 +159,7 @@ function getStats(req, res){
                     ResponseTab[index].lastPlay = moment(row[0].created).format('LLL') 
  
                       //Dates (graph)
-                      db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 10",
+                      db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
                       { replacements: [exo.exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
                       .then(plays => {
                           const proper = []
@@ -180,7 +170,7 @@ function getStats(req, res){
                           console.log(plays)
 
                           //Valeurs (graph)
-                          db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 10",
+                          db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
                           { replacements: [exo.exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
                           .then(scores => {
                             const palmares = []
@@ -241,7 +231,7 @@ function getSingleStats(req, res){
                     ResponseTab[0].lastPlay = moment(last[0].created).format('LLL') 
  
                       //Dates (graph)
-                      db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 10",
+                      db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
                       { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
                       .then(plays => {
                           const proper = []
@@ -252,7 +242,7 @@ function getSingleStats(req, res){
                           console.log(plays)
 
                           //Valeurs (graph)
-                          db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 10",
+                          db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
                           { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
                           .then(scores => {
                             const palmares = []
