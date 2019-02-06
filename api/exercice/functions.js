@@ -276,14 +276,18 @@ function getSingleStats(req, res){
 }
 
 function getGlobal(req, res) {
-  db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id",
+  db.sequelize.query("SELECT p.exo_name, p.exo_id, p.level, p.user_id FROM prescription p, user u WHERE u.id = p.user_id AND p.user_id = ? ORDER BY p.exo_id ASC",
   { replacements: [req.params.id], type: sequelize.QueryTypes.SELECT })
   .then(rows => {
-      var ResponseTab = [{exo_id:[]}, {titles:[]}, {bestscores:[]}, {oldscores:[]}]
+      var ResponseTab = [{exo_id:[]}, {titles:[]}, {bestscores:[]}, {previouscores:[]}, {oldscores:[]}]
       const date = new Date()
       const current = date.getMonth() +1
-      console.log(current)
-      const ancient = (current == 1) ? 12 : current - 1  
+      const previous = (current == 1) ? 12 : current - 1  
+      const ancient = (current == 2) ? 12 : current - 2
+      /*if(current == 1){ancient = 11}
+      else if(current == 2){ancient = 12}
+      else{ancient = current-2}  */
+      console.log('ancient', ancient)
       rows.forEach((exo, index) => {
         ResponseTab[1].titles[index] = exo.exo_name
         ResponseTab[0].exo_id[index] = exo.exo_id
@@ -293,10 +297,16 @@ function getGlobal(req, res) {
                 console.log(row)
                 ResponseTab[2].bestscores[index] = row[0].maxscore
                   db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
-                  { replacements: [exo.exo_id, req.params.id, ancient], type: sequelize.QueryTypes.SELECT })
+                  { replacements: [exo.exo_id, req.params.id, previous], type: sequelize.QueryTypes.SELECT })
                   .then(rowa => { 
-                    ResponseTab[3].oldscores[index] = rowa[0].maxscore
-                    if(index == rows.length - 1){res.send(ResponseTab)}
+                    ResponseTab[3].previouscores[index] = rowa[0].maxscore
+                    db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
+                    { replacements: [exo.exo_id, req.params.id, ancient], type: sequelize.QueryTypes.SELECT })
+                    .then(rowas => {
+                      ResponseTab[4].oldscores[index] = rowas[0].maxscore                     
+                      if(index == rows.length - 1){console.log(ResponseTab); res.send(ResponseTab)}
+                    })
+                    
                   })
                 
               })
