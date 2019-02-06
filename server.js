@@ -178,7 +178,7 @@ userController.post('/result', (req, res) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-app.post('/textts', audio.textToSpeech)
+app.post('/textts/:question', audio.textToSpeech)
 
 app.use('/doctor', doctorController)
 app.use('/user', userController)

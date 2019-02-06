@@ -28,7 +28,7 @@ function textToSpeech(req) {
         if (!error && response.statusCode == 200) {
             //This is the callback to our saveAudio function.
             // It takes a single argument, which is the returned accessToken.
-            saveAudio(body, req.body.txt)
+            saveAudio(body, req.body.txt, req)
         }
         else {
 			
@@ -42,7 +42,7 @@ function textToSpeech(req) {
 /* Make sure to update User-Agent with the name of your resource.
    You can also change the voice and output formats. See:
    https://docs.microsoft.com/azure/cognitive-services/speech-service/language-support#text-to-speech */
-function saveAudio(accessToken, txte) {
+function saveAudio(accessToken, txte, req) {
     // Create the SSML request.
     let xml_body = xmlbuilder.create('speak')
       .att('version', '1.0')
@@ -84,7 +84,7 @@ function saveAudio(accessToken, txte) {
       console.log("Your file is ready.\n")
     }
     // Pipe the response to file.
-    request(options, convertText).pipe(fs.createWriteStream('src/sample.wav'));
+    request(options, convertText).pipe(fs.createWriteStream(`src/sample${req.params.question}.wav`));
 }
 
 // Runs the sample app.
