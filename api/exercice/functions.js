@@ -248,7 +248,7 @@ function getSingleStats(req, res){
                   .then(last => {
                     if(last)
                     {
-                      ResponseTab[0].lastScore = lastlast[0].value
+                      ResponseTab[0].lastScore = last[0].value
                       ResponseTab[0].lastPlay = moment(last[0].created).format('LLL') 
   
                         //Dates (graph)
@@ -302,26 +302,24 @@ function getGlobal(req, res) {
       const current = date.getMonth() +1
       const previous = (current == 1) ? 12 : current - 1  
       const ancient = (current == 2) ? 12 : current - 2
-      /*if(current == 1){ancient = 11}
-      else if(current == 2){ancient = 12}
-      else{ancient = current-2}  */
+
       console.log('ancient', ancient)
       rows.forEach((exo, index) => {
         ResponseTab[1].titles[index] = exo.exo_name
         ResponseTab[0].exo_id[index] = exo.exo_id
-        db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
+        db.sequelize.query("SELECT COUNT(id) AS played FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
               { replacements: [exo.exo_id, req.params.id, current], type: sequelize.QueryTypes.SELECT })
               .then(row => {
                 console.log(row)
-                ResponseTab[2].bestscores[index] = row[0].maxscore
-                  db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
+                ResponseTab[2].bestscores[index] = row[0].played
+                  db.sequelize.query("SELECT COUNT(id) AS played FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
                   { replacements: [exo.exo_id, req.params.id, previous], type: sequelize.QueryTypes.SELECT })
                   .then(rowa => { 
-                    ResponseTab[3].previouscores[index] = rowa[0].maxscore
-                    db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
+                    ResponseTab[3].previouscores[index] = rowa[0].played
+                    db.sequelize.query("SELECT COUNT(id) AS played FROM score WHERE exo_id = ? AND user_id = ? AND month(created) = ?",
                     { replacements: [exo.exo_id, req.params.id, ancient], type: sequelize.QueryTypes.SELECT })
                     .then(rowas => {
-                      ResponseTab[4].oldscores[index] = rowas[0].maxscore                     
+                      ResponseTab[4].oldscores[index] = rowas[0].played                     
                       if(index == rows.length - 1){console.log(ResponseTab); res.send(ResponseTab)}
                     })
                     

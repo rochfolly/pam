@@ -106,6 +106,15 @@ app.get('/', (req, res) => {
   
   doctorController.get('/user/:id/exercices', exercice.fetch)
 
+  doctorController.delete('/:id/user/:user_id', (req, res) => {
+    User.destroy({
+      where: {
+       doctor_id : req.params.id,
+       id : req.params.user_id
+      }
+    })
+  })  
+
   doctorController.get('/user/:id/exercices/other', exercice.fetchOther)
 
   doctorController.get('/user/:id/exercices/checkOther', exercice.checkOther)
