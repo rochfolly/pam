@@ -155,7 +155,7 @@ function getStats(req, res){
           { replacements: [exo.exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
           .then(count => {
               ResponseTab[index].plays = count[0].played
-
+              if(count[0].played != 0){
               //Meilleur score
               db.sequelize.query("SELECT MAX(value) AS maxscore FROM score WHERE exo_id = ? AND user_id = ?",
               { replacements: [exo.exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
@@ -202,7 +202,14 @@ function getStats(req, res){
 
               })
 
-          })        
+            } else{
+              ResponseTab[index].bestScore = 0
+              ResponseTab[index].lastPlay = 'Aucun'
+              ResponseTab[index].lastScore = 'Aucun'
+              ResponseTab[index].values = [0]
+              ResponseTab[index].dates = [0]
+            }
+         })        
 
        })
        
@@ -239,34 +246,41 @@ function getSingleStats(req, res){
                   db.sequelize.query("SELECT created, value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created DESC LIMIT 1",
                   { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
                   .then(last => {
-                    ResponseTab[0].lastScore = last[0].value
-                    ResponseTab[0].lastPlay = moment(last[0].created).format('LLL') 
- 
-                      //Dates (graph)
-                      db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
-                      { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
-                      .then(plays => {
-                          const proper = []
-                          plays.forEach((play, index) => {
-                            proper[index] = moment(play.created).format('L')
-                          })
-                          ResponseTab[0].dates = proper
-                          console.log(plays)
-
-                          //Valeurs (graph)
-                          db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
-                          { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
-                          .then(scores => {
-                            const palmares = []
-                            scores.forEach((score, index) => {
-                             palmares[index] = score.value
+                    if(last)
+                    {
+                      ResponseTab[0].lastScore = lastlast[0].value
+                      ResponseTab[0].lastPlay = moment(last[0].created).format('LLL') 
+  
+                        //Dates (graph)
+                        db.sequelize.query("SELECT created FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
+                        { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+                        .then(plays => {
+                            const proper = []
+                            plays.forEach((play, index) => {
+                              proper[index] = moment(play.created).format('L')
                             })
-                            ResponseTab[0].values = palmares
-                              console.log(ResponseTab)
-                              res.send(ResponseTab)
-                            
-                          })
-                      })
+                            ResponseTab[0].dates = proper
+                            console.log(plays)
+
+                            //Valeurs (graph)
+                            db.sequelize.query("SELECT value FROM score WHERE exo_id = ? AND user_id = ? ORDER BY created ASC LIMIT 15",
+                            { replacements: [row[0].exo_id, req.params.id], type: sequelize.QueryTypes.SELECT })
+                            .then(scores => {
+                              const palmares = []
+                              scores.forEach((score, index) => {
+                              palmares[index] = score.value
+                              })
+                              ResponseTab[0].values = palmares
+                                console.log(ResponseTab)
+                                res.send(ResponseTab)
+                              
+                            })
+                        })
+                    }
+                    else{
+                      const tab = ['Aucune partie enregistrée']
+                      res.send(tab)
+                    }
 
                   })
 
