@@ -74,13 +74,13 @@ function updatePrescription (req, res) {
       Prescription.update({level: pres.level},{
         where: {
           exo_id: pres.exo,
-          user_id: req.params.id
+          user_id: req.params.user_id
         }
       })
     }
     else{
       Prescription.destroy({
-        where:{exo_name:pres.name, user_id: req.params.id}
+        where:{exo_name:pres.name, user_id: req.params.user_id}
       })
     }
     
